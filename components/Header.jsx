@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { signOut, useSession } from "next-auth/react";
 
 //Icons
 import { MdMenu } from "react-icons/md";
@@ -29,6 +30,7 @@ const Header = () => {
   const [isMobile, setIsMobile] = useState(false);
   const sideMenuRef = useRef(null);
   const pathName = usePathname();
+  const { data: session } = useSession();
 
   const [fixedHeader, setFixedHeader] = useState(false);
 
@@ -78,6 +80,14 @@ const Header = () => {
     };
   }, []);
 
+  const handleSignOut = async () => {
+    await signOut({
+      redirect: false,
+      headers: { "x-api-key": process.env.NEXT_PUBLIC_INTERNAL_API_KEY },
+    });
+    router.push("/");
+  };
+
   return (
     <>
       {/* Fixed Top Header */}
@@ -91,7 +101,7 @@ const Header = () => {
             duration: 0.5,
             ease: "easeInOut",
           }}
-          className={`group transition-all duration-300 overflow-hidden shadow-md fixed z-20 w-full text-maincolor bg-opacity-70 bg-gradient-to-t ${
+          className={`group transition-all duration-300 overflow-hidden shadow-md fixed z-20 w-full bg-opacity-70 bg-gradient-to-t ${
             fixedHeader ? "md:py-4 max-md:py-2" : "md:py-3 max-md:py-2"
           } md:px-6 max-md:px-4 to-slate-100 from-white flex justify-center items-center transition duration-300`}
         >
@@ -126,6 +136,8 @@ const Header = () => {
               ></div>
               <div className="flex flex-row gap-8 font-semibold text-2xl max-lg:hidden transition-all duration-300">
                 <NavLink href={"/"} label={"Inbox"} />
+                <NavLink href={"/auth/login"} label={"Login"} />
+                <NavLink href={"/auth/register"} label={"Register"} />
               </div>
               <div className="lg:hidden">
                 <MdMenu
@@ -152,7 +164,7 @@ const Header = () => {
               ease: "easeInOut",
             }}
             exit={{ opacity: 0, x: 100 }}
-            className="fixed top-0 right-0 bg-maincolor text-white h-screen z-50 p-8 flex flex-col gap-8 font-semibold text-2xl lg:hidden"
+            className="fixed top-0 right-0 bg-maincolor h-screen z-50 p-8 flex flex-col gap-8 font-semibold text-2xl lg:hidden"
           >
             <IoMdClose size={30} onClick={() => setShowSideMenu(false)} />
             <NavLink href={"/"} label={"Home"} />

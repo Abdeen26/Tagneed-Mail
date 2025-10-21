@@ -49,10 +49,10 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} ${fredokaVariable.variable} antialiased`}
       >
         <Provider>
-          <main className="flex flex-col overflow-hidden min-h-screen md:text-base text-sm relative bg-background text-maincolor">
-            <div className="flex relative">
-              <Header />
-            </div>
+          <main className="flex flex-col overflow-hidden min-h-screen md:text-base text-sm relative bg-background text-foreground">
+            {/* <div className="flex relative"> */}
+            <Header />
+            {/* </div> */}
 
             <ScrollToTop />
             <GoToTopArrow />

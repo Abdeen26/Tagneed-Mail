@@ -13,6 +13,7 @@
     "bcryptjs": "^3.0.2",
     "form-data": "^4.0.4",
     "framer-motion": "^12.23.24",
+    "mongoose": "^8.19.1",
     "next": "15.5.5",
     "next-auth": "^4.24.11",
     "react": "19.1.0",

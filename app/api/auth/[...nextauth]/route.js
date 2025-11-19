@@ -14,16 +14,17 @@ export const authOptions = {
       },
       async authorize(credentials) {
         await dbConnect();
-
-        const user = await User.findOne({ user: credentials.username });
-
+        const user = await User.findOne({ username: credentials.username });
+        console.log(user);
         if (user) {
           const isMatch = await bcrypt.compare(
             credentials.password,
             user.password
           );
           if (isMatch) {
-            return { id: user._id, name: user.name, user: user.username };
+            return { id: user._id, name: user.name, username: user.username };
+          } else {
+            throw new Error("Invalid username or password");
           }
         }
         return null;
@@ -32,8 +33,11 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60, // default 1 day
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+  },
   pages: {
     signIn: "/auth/login",
   },

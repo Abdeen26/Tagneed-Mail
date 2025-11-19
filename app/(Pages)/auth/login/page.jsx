@@ -9,7 +9,7 @@ import Switch from "react-switch";
 const LoginPage = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [user, setUser] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   // const [data, setData] = useState({
   //   email: "",
@@ -25,7 +25,7 @@ const LoginPage = () => {
     setLoading(true);
     setError("");
     const result = await signIn("credentials", {
-      user,
+      username,
       password,
       redirect: false,
       stayLoggedIn, // This will be passed
@@ -63,9 +63,9 @@ const LoginPage = () => {
         <div className="mb-4">
           <label className="block font-medium text-gray-700">Username</label>
           <input
-            type="tex"
+            type="text"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-maincolor focus:border-maincolor sm:text-sm"
-            onChange={(e) => setUser(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             disabled={loading}
             placeholder="Enter your username..."
             required

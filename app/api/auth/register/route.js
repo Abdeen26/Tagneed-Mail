@@ -4,16 +4,22 @@ import User from "@/lib/models/User";
 import bcrypt from "bcryptjs";
 
 export async function POST(req) {
-  await dbConnect();
-
   try {
+    await dbConnect();
     const { name, username, password } = await req.json();
 
-    const userExists = await User.findOne({ username });
-
-    if (userExists) {
+    if (!name || !username || !password) {
       return NextResponse.json(
-        { message: "User already exists." },
+        { message: "All fields are required." },
+        { status: 400 }
+      );
+    }
+
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { message: "Username already exists." },
         { status: 400 }
       );
     }
@@ -26,10 +32,13 @@ export async function POST(req) {
       password: hashedPassword,
     });
 
-    return NextResponse.json({ user }, { status: 201 });
+    return NextResponse.json(
+      { message: "User registered successfully", user },
+      { status: 201 }
+    );
   } catch (error) {
     return NextResponse.json(
-      { message: "An error occurred while registering the user." },
+      { message: "Server error. Please try again." },
       { status: 500 }
     );
   }

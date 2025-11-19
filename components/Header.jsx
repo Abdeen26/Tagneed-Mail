@@ -5,10 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 //Icons
 import { MdMenu } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
+import { FaSignOutAlt } from "react-icons/fa";
 
 const NavLink = ({ href, label }) => {
   const pathName = usePathname();
@@ -31,6 +33,7 @@ const Header = () => {
   const sideMenuRef = useRef(null);
   const pathName = usePathname();
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [fixedHeader, setFixedHeader] = useState(false);
 
@@ -126,17 +129,28 @@ const Header = () => {
             {/* Desktop Menu */}
             <div
               className={`${
-                !fixedHeader && "gap-3"
+                !fixedHeader && "gap-0"
               } flex flex-col max-lg:flex-row items-center justify-end transition-all duration-300`}
             >
-              <div
-                className={`${
-                  fixedHeader ? "max-h-0 overflow-hidden" : ""
-                } transition-all transform duration-300 w-full gap-6 flex flex-row items-center justify-end`}
-              ></div>
+              {session?.user && (
+                <div className="capitalize w-full flex flex-row items-center font-semibold justify-end gap-4">
+                  <p className="text-xl text-secondcolor">
+                    {session.user.name}
+                  </p>
+                  <p className="transition duration-300 hover:drop-shadow-md cursor-pointer hover:scale-105">
+                    <FaSignOutAlt
+                      onClick={handleSignOut}
+                      color="red"
+                      size={20}
+                    />
+                  </p>
+                </div>
+              )}
               <div className="flex flex-row gap-8 font-semibold text-2xl max-lg:hidden transition-all duration-300">
                 <NavLink href={"/"} label={"Inbox"} />
-                <NavLink href={"/auth/login"} label={"Login"} />
+                {!session?.user && (
+                  <NavLink href={"/auth/login"} label={"Login"} />
+                )}
                 <NavLink href={"/auth/register"} label={"Register"} />
               </div>
               <div className="lg:hidden">
@@ -167,7 +181,9 @@ const Header = () => {
             className="fixed top-0 right-0 bg-maincolor h-screen z-50 p-8 flex flex-col gap-8 font-semibold text-2xl lg:hidden"
           >
             <IoMdClose size={30} onClick={() => setShowSideMenu(false)} />
-            <NavLink href={"/"} label={"Home"} />
+            <NavLink href={"/"} label={"Inbox"} />
+            <NavLink href={"/auth/login"} label={"Login"} />
+            <NavLink href={"/auth/register"} label={"Register"} />
           </motion.div>
         )}
       </AnimatePresence>

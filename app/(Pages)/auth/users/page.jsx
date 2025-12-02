@@ -433,7 +433,7 @@ export default function UsersPage() {
                 disabled={loading}
               >
                 {roleOptions.map((role) => (
-                  <option key={role} value={role}>
+                  <option key={role} value={role} className="capitalize">
                     {role.charAt(0).toUpperCase() + role.slice(1)}
                   </option>
                 ))}

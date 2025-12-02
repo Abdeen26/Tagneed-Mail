@@ -600,7 +600,7 @@ export default function UsersPage() {
                       <td className="p-4">
                         {editingId === user._id ? (
                           <select
-                            className="w-full border border-gray-300 rounded px-3 py-2"
+                            className="w-full border border-gray-300 rounded px-3 py-2 capitalize"
                             value={formData.role}
                             onChange={(e) =>
                               setFormData({ ...formData, role: e.target.value })
@@ -608,7 +608,11 @@ export default function UsersPage() {
                             disabled={loading || isOwnAccount}
                           >
                             {roleOptions.map((role) => (
-                              <option key={role} value={role}>
+                              <option
+                                key={role}
+                                value={role}
+                                className="capitalize"
+                              >
                                 {role.charAt(0).toUpperCase() + role.slice(1)}
                               </option>
                             ))}

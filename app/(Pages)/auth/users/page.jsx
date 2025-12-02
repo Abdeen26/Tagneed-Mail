@@ -425,7 +425,7 @@ export default function UsersPage() {
                 Role
               </label>
               <select
-                className="w-full border border-gray-300 rounded px-3 py-2"
+                className="w-full border border-gray-300 rounded px-3 py-2 capitalize"
                 value={newUser.role}
                 onChange={(e) =>
                   setNewUser({ ...newUser, role: e.target.value })

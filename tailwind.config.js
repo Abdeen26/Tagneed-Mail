@@ -8,17 +8,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        maincolor: "var(--maincolor)",
-        secondcolor: "var(--secondcolor)",
-        thirdcolor: "var(--thirdcolor)",
-        fourthcolor: "var(--fourthcolor)",
+        background: "var(--color-background)",
+        foreground: "var(--color-foreground)",
+        maincolor: "var(--color-maincolor)",
+        secondcolor: "var(--color-secondcolor)",
+        thirdcolor: "var(--color-thirdcolor)",
+        fourthcolor: "var(--color-fourthcolor)",
+      },
+      fontFamily: {
+        sans: ["Fredoka", "sans-serif"],
       },
     },
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: false, // <-- disables DaisyUI's color overrides
+    themes: false,
   },
 };

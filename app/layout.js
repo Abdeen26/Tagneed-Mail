@@ -56,9 +56,7 @@ export default function RootLayout({ children }) {
 
             <ScrollToTop />
             <GoToTopArrow />
-            <div className="flex flex-grow w-full h-full relative">
-              {children}
-            </div>
+            <div className="flex grow w-full h-full relative">{children}</div>
             <Footer />
           </main>
         </Provider>

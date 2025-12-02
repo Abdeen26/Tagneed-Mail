@@ -85,7 +85,8 @@ const Header = () => {
 
   const handleSignOut = async () => {
     await signOut({
-      redirect: false,
+      redirect: true,
+      callbackUrl: "/",
       headers: { "x-api-key": process.env.NEXT_PUBLIC_INTERNAL_API_KEY },
     });
     router.push("/");
@@ -151,7 +152,12 @@ const Header = () => {
                 {!session?.user && (
                   <NavLink href={"/auth/login"} label={"Login"} />
                 )}
-                <NavLink href={"/auth/register"} label={"Register"} />
+                {session?.user?.role === "admin" && (
+                  <>
+                    <NavLink href={"/auth/register"} label={"Register"} />
+                    <NavLink href={"/auth/users"} label={"Users"} />
+                  </>
+                )}
               </div>
               <div className="lg:hidden">
                 <MdMenu

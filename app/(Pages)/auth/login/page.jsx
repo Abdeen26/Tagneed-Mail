@@ -11,10 +11,6 @@ const LoginPage = () => {
   const { data: session, status } = useSession();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // const [data, setData] = useState({
-  //   email: "",
-  //   password: "",
-  // });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -24,34 +20,78 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const result = await signIn("credentials", {
-      username,
-      password,
-      redirect: false,
-      stayLoggedIn, // This will be passed
-    });
 
-    if (!result.error) {
-      setLoading(false);
-      // If the user chooses to stay logged in, extend session duration
-      if (stayLoggedIn) {
-        document.cookie = `next-auth.session-token; Max-Age=${
-          30 * 24 * 60 * 60
-        }; Path=/`; // Example to extend cookie for 30 days
+    try {
+      const result = await signIn("credentials", {
+        username,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        // Handle specific error messages
+        if (result.error.includes("inactive")) {
+          setError("Account is inactive. Please contact your administrator.");
+        } else if (result.error.includes("Invalid")) {
+          setError("Invalid username or password");
+        } else {
+          setError("Login failed. Please try again.");
+        }
+        setLoading(false);
+        return;
       }
 
-      router.push("/");
-    } else {
+      // If login successful
       setLoading(false);
-      setError(result.error);
+
+      // Handle stay logged in option
+      if (stayLoggedIn) {
+        // Update session cookie max age (NextAuth handles this through session.maxAge)
+        // You can also set a custom cookie
+        document.cookie = `next-auth.session-token=; Max-Age=2592000; Path=/`; // 30 days
+      }
+
+      // Redirect to home
+      router.push("/");
+      router.refresh(); // Refresh to get updated session
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("An unexpected error occurred");
+      setLoading(false);
     }
   };
 
+  // Check if user is already logged in
   useEffect(() => {
     if (session && status === "authenticated") {
+      // Also check if session user is active (extra safety)
+      if (session.user?.isActive === false) {
+        // Force logout if user somehow has inactive session
+        signIn("credentials", { redirect: false, callbackUrl: "/login" });
+        return;
+      }
       router.push("/");
     }
-  }, [session, status]);
+  }, [session, status, router]);
+
+  // Add a useEffect to handle URL error parameters (from NextAuth)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorParam = urlParams.get("error");
+
+    if (errorParam) {
+      switch (errorParam) {
+        case "CredentialsSignin":
+          setError("Invalid username or password");
+          break;
+        case "inactive":
+          setError("Account is inactive. Please contact administrator.");
+          break;
+        default:
+          setError("Login failed. Please try again.");
+      }
+    }
+  }, []);
 
   return (
     <div className="flex justify-center items-center ">
@@ -69,6 +109,7 @@ const LoginPage = () => {
             disabled={loading}
             placeholder="Enter your username..."
             required
+            autoComplete="username"
           />
         </div>
         <div className="mb-4">
@@ -81,11 +122,13 @@ const LoginPage = () => {
               disabled={loading}
               placeholder="Enter your password..."
               required
+              autoComplete="current-password"
             />
             <button
               type="button"
               className="absolute right-3 mt-1 text-maincolor hover:cursor-pointer"
               onClick={() => setShowPassword((prev) => !prev)}
+              disabled={loading}
             >
               <BiShow size={20} />
             </button>
@@ -102,6 +145,7 @@ const LoginPage = () => {
             height={20}
             onColor="#485f32"
             offColor="#94a3b8"
+            disabled={loading}
           />
           <label htmlFor="stayLoggedIn" className="text-sm">
             Keep me logged in
@@ -109,15 +153,25 @@ const LoginPage = () => {
         </div>
         {/* Error Message */}
         {error && (
-          <p className="text-[#ff0000af] font-semibold text-center my-2 text-sm">
-            {error}
-          </p>
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-red-600 font-medium text-center text-sm">
+              {error}
+            </p>
+          </div>
         )}
         <button
           type="submit"
-          className="w-full font-semibold bg-maincolor hover:scale-[103%] transition duration-300 hover:drop-shadow-md shadow-lg text-white py-2 px-4 rounded-md hover:bg-secondcolor focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-maincolor"
+          disabled={loading}
+          className="w-full font-semibold bg-maincolor hover:scale-[103%] transition duration-300 hover:drop-shadow-md shadow-lg text-white py-2 px-4 rounded-md hover:bg-secondcolor focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-maincolor disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          {loading ? "Please wait.." : "Login"}
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+              Logging in...
+            </div>
+          ) : (
+            "Login"
+          )}
         </button>
       </form>
     </div>
